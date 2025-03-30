@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA 2K25 MyCareer VC Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+        .container { width: 80%; margin: 20px auto; }
+        h1 { text-align: center; }
+        .section { margin-bottom: 20px; }
+        .label { font-weight: bold; }
+        input[type="number"], select { width: 100%; padding: 8px; margin: 5px 0; }
+        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .badge-list, .attribute-list { display: flex; flex-wrap: wrap; gap: 15px; }
+        .badge, .attribute { border: 1px solid #ccc; padding: 10px; width: 45%; background-color: #fff; }
+        .badge input, .attribute input { margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>NBA 2K25 MyCareer VC Calculator</h1>
+
+        <div class="section">
+            <label for="player-name" class="label">Player Name:</label>
+            <input type="text" id="player-name" placeholder="Enter player name">
+        </div>
+
+        <div class="section">
+            <h3>Player Attributes</h3>
+            <label for="close-shot" class="label">Close Shot:</label>
+            <input type="number" id="close-shot" placeholder="Enter Close Shot value">
+
+            <label for="mid-range" class="label">Mid-Range Shot:</label>
+            <input type="number" id="mid-range" placeholder="Enter Mid-Range Shot value">
+
+            <label for="three-point" class="label">3-Point Shot:</label>
+            <input type="number" id="three-point" placeholder="Enter 3-Point Shot value">
+
+            <label for="layup" class="label">Layup:</label>
+            <input type="number" id="layup" placeholder="Enter Layup value">
+
+            <label for="driving-dunk" class="label">Driving Dunk:</label>
+            <input type="number" id="driving-dunk" placeholder="Enter Driving Dunk value">
+
+            <label for="speed" class="label">Speed:</label>
+            <input type="number" id="speed" placeholder="Enter Speed value">
+
+            <label for="acceleration" class="label">Acceleration:</label>
+            <input type="number" id="acceleration" placeholder="Enter Acceleration value">
+        </div>
+
+        <div class="section">
+            <h3>Choose Badges</h3>
+            <div class="badge-list">
+                <div class="badge">
+                    <label for="catch-shoot">Catch & Shoot:</label>
+                    <input type="checkbox" id="catch-shoot">
+                </div>
+                <div class="badge">
+                    <label for="deadeye">Deadeye:</label>
+                    <input type="checkbox" id="deadeye">
+                </div>
+                <!-- Add other badges here -->
+            </div>
+        </div>
+
+        <div class="section">
+            <button onclick="calculateVC()">Calculate VC</button>
+            <button onclick="resetValues()">Reset</button>
+        </div>
+
+        <div class="section">
+            <h3>Results</h3>
+            <p id="vc-result">VC Required: 0</p>
+        </div>
+    </div>
+
+    <script>
+        function calculateVC() {
+            let vc = 0;
+            // Calculate VC based on input attributes
+            vc += parseInt(document.getElementById("close-shot").value || 0) * 100;
+            vc += parseInt(document.getElementById("mid-range").value || 0) * 150;
+            vc += parseInt(document.getElementById("three-point").value || 0) * 200;
+            vc += parseInt(document.getElementById("layup").value || 0) * 120;
+            vc += parseInt(document.getElementById("driving-dunk").value || 0) * 180;
+            vc += parseInt(document.getElementById("speed").value || 0) * 150;
+            vc += parseInt(document.getElementById("acceleration").value || 0) * 150;
+
+            // Add VC cost for badges
+            if (document.getElementById("catch-shoot").checked) {
+                vc += 300;
+            }
+            if (document.getElementById("deadeye").checked) {
+                vc += 400;
+            }
+
+            // Display the VC required
+            document.getElementById("vc-result").innerText = "VC Required: " + vc;
+        }
+
+        function resetValues() {
+            document.getElementById("player-name").value = '';
+            document.getElementById("close-shot").value = '';
+            document.getElementById("mid-range").value = '';
+            document.getElementById("three-point").value = '';
+            document.getElementById("layup").value = '';
+            document.getElementById("driving-dunk").value = '';
+            document.getElementById("speed").value = '';
+            document.getElementById("acceleration").value = '';
+            document.getElementById("catch-shoot").checked = false;
+            document.getElementById("deadeye").checked = false;
+            document.getElementById("vc-result").innerText = "VC Required: 0";
+        }
+    </script>
+</body>
+</html>
