@@ -101,7 +101,7 @@
             <label>蓋帽：</label><input type="number" id="blocks" value="0"><br>
             <label>失誤：</label><input type="number" id="turnovers" value="0"><br>
             <label>上場時間（分鐘）：</label><input type="number" id="minutes" value="0"><br>
-            <input type="button" value="計算VC (Ctrl+Enter)" onclick="calculateVC()">
+            <input type="button" value="計算並累積VC (Ctrl+Enter)" onclick="calculateVC()">
             <p id="vcAmount">VC: 0</p>
         </div>
 
@@ -200,6 +200,7 @@
         <!-- 重設 -->
         <div class="section">
             <input type="button" value="重設屬性與徽章 (Ctrl+R)" onclick="resetAttributes()">
+            <input type="button" value="VC歸零 (Ctrl+0)" onclick="resetVC()">
         </div>
 
         <!-- 最新屬性 -->
@@ -226,13 +227,14 @@
             let display = "屬性:\n";
             for (let attr in originalAttributes) {
                 display += `${attr}: ${originalAttributes[attr]}\n`;
-                document.getElementById(attr).value = originalAttributes[attr]; // 同步更新輸入框
+                document.getElementById(attr).value = originalAttributes[attr]; // 同步更新初始數據輸入框
             }
             display += "\n徽章:\n";
             for (let badge in badgeUpgrades) {
                 display += `${badge}: ${badgeLevels[badgeUpgrades[badge] - 1]}\n`;
             }
             document.getElementById('finalAttributes').innerHTML = display;
+            document.getElementById('vcAmount').innerHTML = `VC: ${vcAmount}`; // 確保VC顯示更新
         }
 
         function saveAttributes() {
@@ -273,9 +275,11 @@
             const turnovers = parseInt(document.getElementById("turnovers").value) || 0;
             const minutes = parseInt(document.getElementById("minutes").value) || 0;
 
-            vcAmount = points * 5 + assists * 3 + rebounds * 2 + steals * 3 + blocks * 3 - turnovers * 2 + minutes * 2;
+            const newVCAmount = points * 5 + assists * 3 + rebounds * 2 + steals * 3 + blocks * 3 - turnovers * 2 + minutes * 2;
+            vcAmount += newVCAmount; // 累積VC
             document.getElementById("vcAmount").innerHTML = `VC: ${vcAmount}`;
             updateAttributesDisplay();
+            alert(`本次獲得 ${newVCAmount} VC，已累積至 ${vcAmount} VC！`);
         }
 
         function getAttributeUpgradeCost(currentValue, upgradeAmount) {
@@ -357,6 +361,13 @@
             alert("所有數據已重設！");
         }
 
+        function resetVC() {
+            vcAmount = 0;
+            document.getElementById("vcAmount").innerHTML = `VC: ${vcAmount}`;
+            updateAttributesDisplay();
+            alert("VC 已歸零！");
+        }
+
         // 鍵盤功能
         document.addEventListener("keydown", function(event) {
             if (event.key === "Enter" && !event.ctrlKey && !event.shiftKey && !event.altKey) {
@@ -370,6 +381,9 @@
             } else if (event.ctrlKey && event.key === "r") {
                 event.preventDefault();
                 resetAttributes();
+            } else if (event.ctrlKey && event.key === "0") {
+                event.preventDefault();
+                resetVC();
             }
         });
 
