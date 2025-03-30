@@ -88,7 +88,7 @@
             <label>力量：</label><input type="number" id="strength" value="50">
             <label>耐力：</label><input type="number" id="stamina" value="50">
             <label>垂直跳躍：</label><input type="number" id="vertical" value="50"><br>
-            <input type="button" value="確認輸入 (Enter)" onclick="saveAttributes()">
+            <input type="button" value="儲存原始屬性 (Enter)" onclick="saveAttributes()">
         </div>
 
         <!-- 比賽數據 -->
@@ -220,17 +220,17 @@
 
         let badgeUpgrades = {};
         let vcAmount = 0;
+        const badgeLevels = ["青銅", "白銀", "黃金", "名人堂"];
 
         function updateAttributesDisplay() {
             let display = "屬性:\n";
             for (let attr in originalAttributes) {
                 display += `${attr}: ${originalAttributes[attr]}\n`;
-                // 更新輸入框的值
-                document.getElementById(attr).value = originalAttributes[attr];
+                document.getElementById(attr).value = originalAttributes[attr]; // 同步更新輸入框
             }
             display += "\n徽章:\n";
             for (let badge in badgeUpgrades) {
-                display += `${badge}: 等級 ${badgeUpgrades[badge]}\n`;
+                display += `${badge}: ${badgeLevels[badgeUpgrades[badge] - 1]}\n`;
             }
             document.getElementById('finalAttributes').innerHTML = display;
         }
@@ -261,7 +261,7 @@
             originalAttributes.stamina = parseInt(document.getElementById("stamina").value) || 50;
             originalAttributes.vertical = parseInt(document.getElementById("vertical").value) || 50;
             updateAttributesDisplay();
-            alert("初始屬性已保存！");
+            alert("原始屬性已儲存！");
         }
 
         function calculateVC() {
@@ -278,38 +278,67 @@
             updateAttributesDisplay();
         }
 
+        function getAttributeUpgradeCost(currentValue, upgradeAmount) {
+            let totalCost = 0;
+            for (let i = 0; i < upgradeAmount; i++) {
+                const value = currentValue + i;
+                if (value <= 70) totalCost += 100;
+                else if (value <= 85) totalCost += 250;
+                else if (value <= 95) totalCost += 500;
+                else if (value <= 99) totalCost += 1000;
+                else {
+                    alert("屬性已達上限 (99)！");
+                    return -1; // 表示無法升級
+                }
+            }
+            return totalCost;
+        }
+
         function upgradeAttribute() {
             const selectedAttribute = document.getElementById("attributeUpgrade").value;
             const upgradeAmount = parseInt(document.getElementById("upgradeAmount").value) || 1;
-            const cost = upgradeAmount * 10;
+            const currentValue = originalAttributes[selectedAttribute];
+            const cost = getAttributeUpgradeCost(currentValue, upgradeAmount);
 
+            if (cost === -1) return; // 已達上限
             if (vcAmount >= cost) {
                 originalAttributes[selectedAttribute] += upgradeAmount;
                 vcAmount -= cost;
                 document.getElementById("vcAmount").innerHTML = `VC: ${vcAmount}`;
                 updateAttributesDisplay();
-                alert(`${selectedAttribute} 已升級 ${upgradeAmount} 點！`);
+                alert(`${selectedAttribute} 已升級 ${upgradeAmount} 點，花费 ${cost} VC！`);
             } else {
-                alert("VC不足，無法升級屬性！");
+                alert("VC 不足，無法升級屬性！");
+            }
+        }
+
+        function getBadgeUpgradeCost(currentLevel) {
+            switch (currentLevel) {
+                case 0: return 500;  // 青銅
+                case 1: return 1000; // 白銀
+                case 2: return 2000; // 黃金
+                case 3: return 4000; // 名人堂
+                default: return -1;  // 已達上限
             }
         }
 
         function upgradeBadge() {
             const selectedBadge = document.getElementById("badgeUpgrades").value;
-            const cost = 50; // 假設每個徽章升級需要50 VC
+            const currentLevel = badgeUpgrades[selectedBadge] || 0;
+            const cost = getBadgeUpgradeCost(currentLevel);
 
+            if (cost === -1) {
+                alert("徽章已達名人堂等級，無法再升級！");
+                return;
+            }
             if (vcAmount >= cost) {
-                if (!badgeUpgrades[selectedBadge]) {
-                    badgeUpgrades[selectedBadge] = 1;
-                } else {
-                    badgeUpgrades[selectedBadge] += 1;
-                }
+                badgeUpgrades[selectedBadge] = currentLevel + 1;
                 vcAmount -= cost;
                 document.getElementById("vcAmount").innerHTML = `VC: ${vcAmount}`;
                 updateAttributesDisplay();
-                alert(`${selectedBadge} 徽章已升級到等級 ${badgeUpgrades[selectedBadge]}！`);
+                alert(`${selectedBadge} 已升級到 ${badgeLevels[currentLevel]}，花费 ${cost} VC！`);
             } else {
-                alert("VC不足，無法升級徽章！");
+                alert("VC 不足，無法升級徽章！");
             }
         }
 
